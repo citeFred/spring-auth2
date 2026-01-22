@@ -1,5 +1,7 @@
 package com.meta.springauth2.auth.config;
 
+import com.meta.springauth2.auth.filter.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,10 +13,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration // SpringBoot 설정파일 Bean으로 등록
 @EnableWebSecurity // SpringSecurity 활성화 애너테이션
+@RequiredArgsConstructor
 public class SecurityConfig {
+    // JwtAuthenticationFilter 주입을 위한 final 필드 추가
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     // 비밀번호 인코딩 (BCrypt) 사용, Bean으로 등록
     @Bean
@@ -58,7 +64,7 @@ public class SecurityConfig {
                 // 인가(Authorization) 부분 설명
                 // 엔드포인트 접근 권한을 설정하는 부분으로 가장 많이 수정, 작성해야 하는 부분
                 .authorizeHttpRequests((authorize) -> authorize
-                        // 아래 우리가 생성한 API (해당 프로젝트에서는 api/auth/…) 는 인증(Authentication) 없이 접근 가능
+                        // 아래 우리가 생성한 API (해당 프로젝트에서는 api/auth/...) 는 인증(Authentication) 없이 접근 가능
                         // permitAll()은 인증없이 패스
                         // ex) 회원가입/로그인 요청 로그인(인증)을 하기 위해서 접근하는 요청이므로 로그인 상태를 가질 수 없음, 따라서 인증정보 없이도 접근 가능해야함
                         .requestMatchers("/api/auth/**").permitAll()
@@ -67,7 +73,12 @@ public class SecurityConfig {
                         // ex) 위 permitAll 외 모든 요청(anyRequest)은 로그인 상태(authenicated)를 필요로 함
                         // ex) 요청 헤더에 JWT 토큰이 있는지 확인하게 됨, 상세는 JWT 필터를 통해서 인증된 상태가 전달 될 예정
                         .anyRequest().authenticated()
-                );
+                )
+
+                // JWT 필터를 UsernamePasswordAuthenticationFilter 이전에 추가
+                // 이 필터는 요청 헤더의 JWT를 검증하고 SecurityContext에 인증 정보를 설정하는 역할
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
