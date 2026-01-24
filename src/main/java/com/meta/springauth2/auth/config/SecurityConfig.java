@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration // SpringBoot 설정파일 Bean으로 등록
 @EnableWebSecurity // SpringSecurity 활성화 애너테이션
+@EnableMethodSecurity // SpringSecurity RBAC를 위한 메서드 권한 제어 활성화 애너테이션
 @RequiredArgsConstructor
 public class SecurityConfig {
     // JwtAuthenticationFilter 주입을 위한 final 필드 추가
@@ -68,6 +70,7 @@ public class SecurityConfig {
                         // permitAll()은 인증없이 패스
                         // ex) 회원가입/로그인 요청 로그인(인증)을 하기 위해서 접근하는 요청이므로 로그인 상태를 가질 수 없음, 따라서 인증정보 없이도 접근 가능해야함
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/sample/**").permitAll()
                         //.requestMatchers("/api/memo/**").permitAll() // 다음 처럼 접근 허용하고자 하는 곳을 복사하여 작성해나가면 됨
 
                         // ex) 위 permitAll 외 모든 요청(anyRequest)은 로그인 상태(authenicated)를 필요로 함
