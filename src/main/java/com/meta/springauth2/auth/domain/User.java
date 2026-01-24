@@ -5,12 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @Entity
 @Getter
@@ -38,6 +36,13 @@ public class User extends TimeStamped implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    public User(String username, String nickname, String password, String email, UserRole userRole) {
+        this.username = username;
+        this.nickname = nickname;
+        this.password = password;
+        this.email = email;
+        this.userRole = userRole;
+    }
 
     // -- UserDetails 인터페이스 추상메서드의 구현체(Override) 부분 --
     @Override
