@@ -1,6 +1,8 @@
 package com.meta.springauth2.auth.config;
 
 import com.meta.springauth2.auth.filter.JwtAuthenticationFilter;
+import com.meta.springauth2.auth.handler.CustomAccessDeniedHandler;
+import com.meta.springauth2.auth.handler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +25,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     // JwtAuthenticationFilter 주입을 위한 final 필드 추가
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
+    // 인가 예외 처리 커스텀 핸들러 주입
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     // 비밀번호 인코딩 (BCrypt) 사용, Bean으로 등록
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -62,6 +66,12 @@ public class SecurityConfig {
                 // 각 요청에 JWT 토큰을 담아서 인증 정보를 전달/확인하는 방식으로 설계할 것임
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // 예외 처리 핸들러 등록
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(accessDeniedHandler)          // 403 에러 처리
+                        .authenticationEntryPoint(authenticationEntryPoint) // 401 에러 처리
+                )
 
                 // 인가(Authorization) 부분 설명
                 // 엔드포인트 접근 권한을 설정하는 부분으로 가장 많이 수정, 작성해야 하는 부분
