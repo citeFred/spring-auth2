@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration // SpringBoot 설정파일 Bean으로 등록
 @EnableWebSecurity // SpringSecurity 활성화 애너테이션
@@ -38,6 +39,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // CORS 설정을 Security 필터 체인에 통합
+                .cors(withDefaults())
+
                 // CSRF 부분 설명
                 // CSRF(Cross-Site Request Forgery) 교차 요청 위조 공격
                 // 우리는 JWT와 같은 토큰 기반 인증 시스템을 사용하도록 설계할 것임
@@ -87,5 +91,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 }
